@@ -1,5 +1,4 @@
 package com.reviews.controller;
-
 import com.reviews.dto.*;
 import com.reviews.service.ReviewService;
 import jakarta.validation.Valid;
@@ -9,49 +8,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/reviews")
-@RequiredArgsConstructor
+@RestController @RequestMapping("/api/reviews") @RequiredArgsConstructor
 public class ReviewController {
-
-    private final ReviewService reviewService;
+    private final ReviewService service;
 
     @PostMapping
-    public ResponseEntity<ReviewResponse> submitReview(@Valid @RequestBody ReviewRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.submitReview(request));
+    public ResponseEntity<ReviewResponse> submit(@Valid @RequestBody ReviewRequest req) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.submitReview(req));
     }
-
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<ReviewResponse>> getProductReviews(@PathVariable String productId) {
-        return ResponseEntity.ok(reviewService.getProductReviews(productId));
+        return ResponseEntity.ok(service.getProductReviews(productId));
     }
-
     @GetMapping("/product/{productId}/summary")
-    public ResponseEntity<ProductRatingSummary> getProductRatingSummary(@PathVariable String productId) {
-        return ResponseEntity.ok(reviewService.getProductRatingSummary(productId));
+    public ResponseEntity<ProductRatingSummary> getSummary(@PathVariable String productId) {
+        return ResponseEntity.ok(service.getRatingSummary(productId));
     }
-
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<ReviewResponse>> getCustomerReviews(@PathVariable String customerId) {
-        return ResponseEntity.ok(reviewService.getCustomerReviews(customerId));
-    }
-
     @GetMapping("/pending")
-    public ResponseEntity<List<ReviewResponse>> getPendingReviews() {
-        return ResponseEntity.ok(reviewService.getPendingReviews());
+    public ResponseEntity<List<ReviewResponse>> getPending() { return ResponseEntity.ok(service.getPendingReviews()); }
+    @PutMapping("/{id}/moderate")
+    public ResponseEntity<ReviewResponse> moderate(@PathVariable Long id, @RequestParam boolean approve) {
+        return ResponseEntity.ok(service.moderate(id, approve));
     }
-
-    @PutMapping("/{reviewId}/moderate")
-    public ResponseEntity<ReviewResponse> moderateReview(
-            @PathVariable Long reviewId,
-            @RequestParam boolean approve) {
-        return ResponseEntity.ok(reviewService.moderateReview(reviewId, approve));
-    }
-
-    @PutMapping("/{reviewId}/helpful")
-    public ResponseEntity<ReviewResponse> voteHelpful(
-            @PathVariable Long reviewId,
-            @RequestParam boolean helpful) {
-        return ResponseEntity.ok(reviewService.voteHelpful(reviewId, helpful));
+    @PutMapping("/{id}/helpful")
+    public ResponseEntity<ReviewResponse> helpful(@PathVariable Long id, @RequestParam boolean helpful) {
+        return ResponseEntity.ok(service.voteHelpful(id, helpful));
     }
 }

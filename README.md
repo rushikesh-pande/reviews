@@ -1,44 +1,29 @@
-# Reviews Microservice
+# Reviews Microservice — Enhancement 13
 
-## Enhancement 13 — Product Reviews & Ratings
+**Product Reviews & Ratings** — Spring Boot 3.2.2, Java 17, Kafka
 
-Production-ready Spring Boot 3.2.2 microservice for managing product reviews and ratings.
+## Features
+- Star ratings (1-5), verified purchase badge, photo/video URLs
+- Helpful voting, review moderation (approve/reject), product rating summary
 
-### Features
-- ✅ Post-purchase review submission
-- ✅ Star ratings (1–5)
-- ✅ Photo/video review URLs
-- ✅ Verified purchase badge
-- ✅ Helpful review voting
-- ✅ Review moderation (approve/reject)
-- ✅ Product rating summary with breakdown
-- ✅ Kafka event publishing
+## Kafka Topics
+| Topic | Trigger |
+|-------|---------|
+| `review.submitted` | New review posted |
+| `review.approved`  | Moderator approves |
+| `review.helpful`   | Helpful vote cast  |
 
-### Kafka Topics
-| Topic | Description |
-|-------|-------------|
-| `review.submitted` | New review submitted by customer |
-| `review.approved` | Review approved by moderator |
-| `review.helpful` | Review marked as helpful |
-
-### API Endpoints
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/reviews` | Submit a review |
-| GET | `/api/reviews/product/{productId}` | Get product reviews |
-| GET | `/api/reviews/product/{productId}/summary` | Rating summary |
-| GET | `/api/reviews/customer/{customerId}` | Customer reviews |
+## API
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/reviews` | Submit review |
+| GET | `/api/reviews/product/{id}` | Product reviews |
+| GET | `/api/reviews/product/{id}/summary` | Rating summary |
 | GET | `/api/reviews/pending` | Pending moderation |
-| PUT | `/api/reviews/{id}/moderate?approve=true` | Moderate review |
+| PUT | `/api/reviews/{id}/moderate?approve=true` | Moderate |
 | PUT | `/api/reviews/{id}/helpful?helpful=true` | Vote helpful |
 
-### Tech Stack
-- Java 17, Spring Boot 3.2.2, Maven
-- Spring Data JPA + H2
-- Spring Kafka
-- Lombok, Bean Validation
-
-### Run
+## Run
 ```bash
 mvn spring-boot:run
 ```
