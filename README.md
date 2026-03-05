@@ -1,46 +1,44 @@
-# Reviews & Ratings Microservice
+# Reviews Microservice
 
-## Overview
-Spring Boot microservice for post-purchase product reviews and ratings.
+## Enhancement 13 — Product Reviews & Ratings
 
-## Features
-- Post-purchase review requests (triggered via Kafka `order.completed`)
-- Star ratings (1–5)
-- Photo/video review support
-- Verified purchase badge
-- Helpful review voting
-- Review moderation (approve/reject)
+Production-ready Spring Boot 3.2.2 microservice for managing product reviews and ratings.
 
-## Kafka Topics
-| Topic              | Direction | Description                    |
-|--------------------|-----------|--------------------------------|
-| `order.completed`  | CONSUME   | Triggers review request        |
-| `review.submitted` | PRODUCE   | New review submitted            |
-| `review.approved`  | PRODUCE   | Review approved by moderator   |
-| `review.helpful`   | PRODUCE   | Review voted as helpful        |
+### Features
+- ✅ Post-purchase review submission
+- ✅ Star ratings (1–5)
+- ✅ Photo/video review URLs
+- ✅ Verified purchase badge
+- ✅ Helpful review voting
+- ✅ Review moderation (approve/reject)
+- ✅ Product rating summary with breakdown
+- ✅ Kafka event publishing
 
-## API Endpoints
-| Method | Path                                    | Description                    |
-|--------|-----------------------------------------|--------------------------------|
-| POST   | `/api/reviews`                          | Submit a new review            |
-| GET    | `/api/reviews/product/{productId}`      | Get approved product reviews   |
-| GET    | `/api/reviews/product/{productId}/rating` | Get average rating           |
-| GET    | `/api/reviews/pending`                  | Get reviews pending moderation |
-| PUT    | `/api/reviews/{id}/approve`             | Approve a review               |
-| PUT    | `/api/reviews/{id}/reject`              | Reject a review                |
-| POST   | `/api/reviews/{id}/helpful`             | Vote review as helpful         |
-| GET    | `/api/reviews/customer/{customerId}`    | Get reviews by customer        |
+### Kafka Topics
+| Topic | Description |
+|-------|-------------|
+| `review.submitted` | New review submitted by customer |
+| `review.approved` | Review approved by moderator |
+| `review.helpful` | Review marked as helpful |
 
-## Tech Stack
-- Java 17
-- Spring Boot 3.2.2
-- Spring Data JPA / H2 (dev)
+### API Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/reviews` | Submit a review |
+| GET | `/api/reviews/product/{productId}` | Get product reviews |
+| GET | `/api/reviews/product/{productId}/summary` | Rating summary |
+| GET | `/api/reviews/customer/{customerId}` | Customer reviews |
+| GET | `/api/reviews/pending` | Pending moderation |
+| PUT | `/api/reviews/{id}/moderate?approve=true` | Moderate review |
+| PUT | `/api/reviews/{id}/helpful?helpful=true` | Vote helpful |
+
+### Tech Stack
+- Java 17, Spring Boot 3.2.2, Maven
+- Spring Data JPA + H2
 - Spring Kafka
-- Lombok
-- Maven
+- Lombok, Bean Validation
 
-## Running Locally
+### Run
 ```bash
 mvn spring-boot:run
 ```
-Server starts on port **8087**.
