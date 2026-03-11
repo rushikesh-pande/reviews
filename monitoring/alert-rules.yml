@@ -1,0 +1,79 @@
+# Monitoring Enhancement: Prometheus Alert Rules for reviews
+# Deploy to AlertManager alongside Prometheus scrape config.
+groups:
+  - name: reviews_alerts
+    interval: 30s
+    rules:
+
+      # ── High Error Rate ──────────────────────────────────────────────────────
+      - alert: HighErrorRate_reviews
+        expr: |
+          rate(reviews_errors_total{service="reviews"}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: reviews
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "Error rate is {{ $value | humanizePercentage }} on reviews"
+
+      # ── High HTTP Latency ────────────────────────────────────────────────────
+      - alert: HighLatency_reviews
+        expr: |
+          histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{service="reviews"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: reviews
+        annotations:
+          summary: "p95 latency above 2s on reviews"
+          description: "p95 latency is {{ $value }}s on reviews"
+
+      # ── Service Down ─────────────────────────────────────────────────────────
+      - alert: ServiceDown_reviews
+        expr: |
+          up{job="reviews"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: reviews
+        annotations:
+          summary: "reviews is DOWN"
+          description: "reviews Prometheus target is not reachable"
+
+      # ── High Heap Memory ─────────────────────────────────────────────────────
+      - alert: HighHeapMemory_reviews
+        expr: |
+          (jvm_memory_used_bytes{service="reviews",area="heap"} /
+           jvm_memory_max_bytes{service="reviews",area="heap"}) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: reviews
+        annotations:
+          summary: "JVM Heap above 85% on reviews"
+          description: "Heap usage is {{ $value | humanizePercentage }} on reviews"
+
+      # ── Too Many 5xx Responses ───────────────────────────────────────────────
+      - alert: High5xxRate_reviews
+        expr: |
+          rate(http_server_requests_seconds_count{service="reviews",status=~"5.."}[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          service: reviews
+        annotations:
+          summary: "High 5xx rate on reviews"
+          description: "5xx rate is {{ $value | humanize }} req/s on reviews"
+
+      # ── High CPU Usage ───────────────────────────────────────────────────────
+      - alert: HighCpuUsage_reviews
+        expr: |
+          process_cpu_usage{service="reviews"} > 0.80
+        for: 5m
+        labels:
+          severity: warning
+          service: reviews
+        annotations:
+          summary: "CPU above 80% on reviews"
+          description: "CPU usage is {{ $value | humanizePercentage }} on reviews"
